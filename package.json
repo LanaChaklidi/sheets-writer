@@ -1,0 +1,37 @@
+{
+  "name": "google-sheets-writer",
+  "version": "1.0.0",
+  "description": "Node.js приложение для записи данных в Google Таблицы через API, развертываемое на Google Cloud Run",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "curl -X POST http://localhost:8080 -H \"Content-Type: application/json\" -d '{\"command\": \"впиши\", \"value\": \"Тестовое значение\"}'",
+    "health": "curl http://localhost:8080/health"
+  },
+  "keywords": [
+    "google-sheets",
+    "api",
+    "express",
+    "nodejs",
+    "cloud-run",
+    "googleapis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "dotenv": "^16.6.0",
+    "express": "^5.1.0",
+    "google-auth-library": "^10.1.0",
+    "googleapis": "^150.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

@@ -1,0 +1,62 @@
+# Google Cloud Build configuration for building and deploying to Cloud Run
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/sheets-writer:$BUILD_ID', '.']
+    
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/sheets-writer:$BUILD_ID']
+    
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'sheets-writer'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/sheets-writer:$BUILD_ID'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GOOGLE_SPREADSHEET_ID=${_GOOGLE_SPREADSHEET_ID}'
+      - '--set-env-vars'
+      - 'GOOGLE_SHEET_RANGE=${_GOOGLE_SHEET_RANGE}'
+      - '--service-account'
+      - '${_SERVICE_ACCOUNT_EMAIL}'
+      - '--max-instances'
+      - '10'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--timeout'
+      - '300'
+
+# Substitution variables (set these in Cloud Build trigger or pass via --substitutions)
+substitutions:
+  _GOOGLE_SPREADSHEET_ID: 'your_spreadsheet_id_here'
+  _GOOGLE_SHEET_RANGE: 'Лист1!A:C'
+  _SERVICE_ACCOUNT_EMAIL: 'sheets-writer@${PROJECT_ID}.iam.gserviceaccount.com'
+
+# Images to be pushed to Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/sheets-writer:$BUILD_ID'
+
+# Build options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+# Build timeout
+timeout: '600s'
+
+# Tags for organizing builds
+tags:
+  - 'sheets-writer'
+  - 'nodejs'
+  - 'google-sheets-api'
